@@ -1,0 +1,65 @@
+diff -r -u linux-2.6.32.27-org/net/ipv4/ip_forward.c linux-2.6.32.27/net/ipv4/ip_forward.c
+--- linux-2.6.32.27-org/net/ipv4/ip_forward.c	2010-12-09 22:29:45.000000000 +0100
++++ linux-2.6.32.27/net/ipv4/ip_forward.c	2010-12-12 22:40:30.000000000 +0100
+@@ -129,3 +129,5 @@
+ 	kfree_skb(skb);
+ 	return NET_RX_DROP;
+ }
++
++EXPORT_SYMBOL(ip_forward);
+diff -r -u linux-2.6.32.27-org/net/ipv6/ip6_output.c linux-2.6.32.27/net/ipv6/ip6_output.c
+--- linux-2.6.32.27-org/net/ipv6/ip6_output.c	2010-12-09 22:29:45.000000000 +0100
++++ linux-2.6.32.27/net/ipv6/ip6_output.c	2010-12-12 22:41:29.000000000 +0100
+@@ -1545,3 +1545,5 @@
+ 
+ 	ip6_cork_release(inet_sk(sk), inet6_sk(sk));
+ }
++
++EXPORT_SYMBOL(ip6_forward);
+diff -r -u linux-2.6.32.27-org/net/ipv6/Kconfig linux-2.6.32.27/net/ipv6/Kconfig
+--- linux-2.6.32.27-org/net/ipv6/Kconfig	2010-12-09 22:29:45.000000000 +0100
++++ linux-2.6.32.27/net/ipv6/Kconfig	2010-12-12 22:46:51.000000000 +0100
+@@ -182,6 +182,22 @@
+ 
+ 	  If unsure, say N.
+ 
++config IP46_NAT
++       tristate "IPv4-IPv6 NAT translator"
++       ---help---
++         Performs IPv4-IPv6 NAT. See http://klub.com.pl/ip46nat/ for details.
++	 Before using this module, make sure that you have IPv4 and IPv6 routing
++	 configured properly, that both IPv4 and IPv6 forwarding is enabled.
++	 Then load module using following command:
++
++	   modprobe ip46nat v6prefixm=2000:: v6prefixp=3000:: v4addr=192.168.1.0
++	 It will then NAT all IPv4 packets coming from 192.168.1.0/24 to
++	 IPv6 packets. Expanded (IPv4 to IPv6) address will be in form:
++	 src=v6prefixp+IPv4.src dst=v6prefixm+IPv4.dst
++	 Symmetrical reverse traffic (IPv6->IPv4) will also be supported.
++
++	 If you don't understand this, say N.
++
+ config IPV6_MULTIPLE_TABLES
+ 	bool "IPv6: Multiple Routing Tables"
+ 	depends on EXPERIMENTAL
+diff -r -u linux-2.6.32.27-org/net/ipv6/Makefile linux-2.6.32.27/net/ipv6/Makefile
+--- linux-2.6.32.27-org/net/ipv6/Makefile	2010-12-09 22:29:45.000000000 +0100
++++ linux-2.6.32.27/net/ipv6/Makefile	2010-12-12 22:47:54.000000000 +0100
+@@ -40,3 +40,5 @@
+ obj-y += addrconf_core.o exthdrs_core.o
+ 
+ obj-$(subst m,y,$(CONFIG_IPV6)) += inet6_hashtables.o
++
++obj-$(CONFIG_IP46_NAT) += ip46nat.o
+diff -r -u linux-2.6.32.27-org/net/ipv6/route.c linux-2.6.32.27/net/ipv6/route.c
+--- linux-2.6.32.27-org/net/ipv6/route.c	2010-12-09 22:29:45.000000000 +0100
++++ linux-2.6.32.27/net/ipv6/route.c	2010-12-12 22:42:54.000000000 +0100
+@@ -803,6 +803,8 @@
+ 	skb_dst_set(skb, fib6_rule_lookup(net, &fl, flags, ip6_pol_route_input));
+ }
+ 
++EXPORT_SYMBOL(ip_route_input);
++
+ static struct rt6_info *ip6_pol_route_output(struct net *net, struct fib6_table *table,
+ 					     struct flowi *fl, int flags)
+ {
