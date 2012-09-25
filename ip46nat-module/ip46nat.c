@@ -28,7 +28,7 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Tomasz Mrugalski");
 MODULE_DESCRIPTION("IPv4-IPv6 translator");
-#define MODULE_VERS "2011-09-11"
+#define MODULE_VERS "2011-10-14"
 #define MODULE_NAME "ip46nat"
 
 #define V6PREFIX_MAX_LEN 64
@@ -54,7 +54,7 @@ static char v4addr_str[V4ADDR_MAX_LEN];
 /* module parameters */
 static char  cfg_prefixlan[16]; /* src prefix */
 static char  cfg_prefixwan[16]; /* dst prefix */
-static int   cfg_v6prefix_length = 64;
+static int   cfg_v6prefix_length = 128;
 
 static short cfg_v4offset = 96; /* specified in bits */
 static __u32 cfg_v4addr; /* v4 prefix */
@@ -73,6 +73,7 @@ module_param_string(v4addr,    v4addr_str, V4ADDR_MAX_LEN, 0);
 module_param_named(v4offset,   cfg_v4offset, short, 0);
 module_param_named(debug,      cfg_debug, short, 0);
 module_param_named(v4masklen,  cfg_v4masklen, short, 0);
+module_param_named(v6prefixlen, cfg_v6prefix_length, short, 0);
 
 struct packet_type ipv4_pkt;
 struct packet_type ipv6_pkt;
