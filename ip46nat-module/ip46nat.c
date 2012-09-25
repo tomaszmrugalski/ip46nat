@@ -28,7 +28,7 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Tomasz Mrugalski");
 MODULE_DESCRIPTION("IPv4-IPv6 translator");
-#define MODULE_VERS "2011-10-14"
+#define MODULE_VERS "2012-09-25"
 #define MODULE_NAME "ip46nat"
 
 #define V6PREFIX_MAX_LEN 64
@@ -250,8 +250,8 @@ static int ipv4_send_as_ipv6(struct sk_buff * skb)
 
     if (cfg_debug>=DEBUG_MATCHED)
     {
-	in4_ntop(buf1, hdr4->saddr);
-	in4_ntop(buf2, hdr4->daddr);
+	in4_ntop(buf1, ntohl(hdr4->saddr));
+	in4_ntop(buf2, ntohl(hdr4->daddr));
 	in6_ntop(buf3, v6saddr);
 	in6_ntop(buf4, v6daddr);
 
@@ -342,8 +342,8 @@ static int ipv4_handler(struct sk_buff *skb,struct net_device *dev, struct packe
 
     cnt4rcv++;
 
-    in4_ntop(buf1, hdr->saddr);
-    in4_ntop(buf2, hdr->daddr);
+    in4_ntop(buf1, ntohl(hdr->saddr));
+    in4_ntop(buf2, ntohl(hdr->daddr));
     in4_ntop(buf3, (cfg_v4addr & cfg_v4mask) );
 
     /* IPv4 address pattern checking */
@@ -629,22 +629,22 @@ static int __init hello_init(void)
     switch (cfg_v4masklen) {
     case 32:
     {
-	cfg_v4mask = 0xffffffff; /* v4 addrs are stored in network byte order */
+	cfg_v4mask = htonl(0xffffffff); /* v4 addrs are stored in network byte order */
 	break;
     }
     case 24:
     {
-	cfg_v4mask = 0x00ffffff;
+	cfg_v4mask = htonl(0x00ffffff);
 	break;
     }
     case 16:
     {
-	cfg_v4mask = 0x0000ffff;
+	cfg_v4mask = htonl(0x0000ffff);
 	break;
     }
     case 8:
     {
-	cfg_v4mask = 0x000000ff;
+	cfg_v4mask = htonl(0x000000ff);
 	break;
     }
     default:

@@ -1,3 +1,5 @@
+2012-09-25
+   - Endianess fix
 2011-10-14
    - Added parameter for v6prefixlen and changed default IPv6 Prefix length
      value to 128
