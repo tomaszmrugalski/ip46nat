@@ -54,7 +54,7 @@ static char v4addr_str[V4ADDR_MAX_LEN];
 /* module parameters */
 static char  cfg_prefixlan[16]; /* src prefix */
 static char  cfg_prefixwan[16]; /* dst prefix */
-static int   cfg_v6prefix_length = 128;
+static short   cfg_v6prefix_length = 128;
 
 static short cfg_v4offset = 96; /* specified in bits */
 static __u32 cfg_v4addr; /* v4 prefix */
