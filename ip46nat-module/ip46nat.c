@@ -28,7 +28,7 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Tomasz Mrugalski");
 MODULE_DESCRIPTION("IPv4-IPv6 translator");
-#define MODULE_VERS "2012-09-25"
+#define MODULE_VERS "2012-10-08"
 #define MODULE_NAME "ip46nat"
 
 #define V6PREFIX_MAX_LEN 64
@@ -441,8 +441,8 @@ static int ipv6_send_as_ipv4(struct sk_buff * skb)
     int truncSize = 0;
 
 
-    v4saddr = *( (__u32*)&(hdr->saddr.s6_addr[cfg_offset]) );
-    v4daddr = *( (__u32*)&(hdr->daddr.s6_addr[cfg_offset]) );
+    v4saddr = htonl(*( (__u32*)&(hdr->saddr.s6_addr[cfg_offset]) ));
+    v4daddr = htonl(*( (__u32*)&(hdr->daddr.s6_addr[cfg_offset]) ));
 
     if (cfg_debug>DEBUG_NONE)
     {
