@@ -105,7 +105,7 @@ static void procfs_exit(void);
 void in4_ntop(char * buf, int addr)
 {
     addr = htonl(addr);
-    sprintf(buf, "%d.%d.%d.%d", (addr>>24) & 0xff, (addr>>24) & 0xff, (addr>>8) & 0xff, addr & 0xff);
+    sprintf(buf, "%d.%d.%d.%d", (addr>>24) & 0xff, (addr>>16) & 0xff, (addr>>8) & 0xff, addr & 0xff);
 }
 
 void in6_ntop(char * dst, const unsigned char * src)
