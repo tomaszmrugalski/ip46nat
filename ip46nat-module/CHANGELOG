@@ -1,5 +1,13 @@
+2012-10-09
+    - module should now print IPv4 addresses correctly
+    - reverted previous change with useless htonl
+    - mask should now be calculated correctly on big and little endians
+    - debugging information (in /proc/ip46nat/params) now include v4mask.
+    - example script salvaged from a working little endian prototype added
+
 2012-10-08
    - Endianess fix in ipv6_send_as_ipv4
+   - IPv6 prefix length type mismatch fixed (fix by Bartek Nowicki)
 
 2012-09-25
    - Endianess fix

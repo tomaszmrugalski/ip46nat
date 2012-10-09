@@ -28,7 +28,7 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Tomasz Mrugalski");
 MODULE_DESCRIPTION("IPv4-IPv6 translator");
-#define MODULE_VERS "2012-10-08"
+#define MODULE_VERS "2012-10-09"
 #define MODULE_NAME "ip46nat"
 
 #define V6PREFIX_MAX_LEN 64
@@ -104,7 +104,8 @@ static void procfs_exit(void);
 
 void in4_ntop(char * buf, int addr)
 {
-    sprintf(buf, "%d.%d.%d.%d", addr&0xff, (addr>>8)&0xff, (addr>>16)&0xff, (addr>>24)&0xff);
+    addr = htonl(addr);
+    sprintf(buf, "%d.%d.%d.%d", (addr>>24) & 0xff, (addr>>24) & 0xff, (addr>>8) & 0xff, addr & 0xff);
 }
 
 void in6_ntop(char * dst, const unsigned char * src)
@@ -243,15 +244,18 @@ static int ipv4_send_as_ipv6(struct sk_buff * skb)
     struct iphdr * hdr4 = ip_hdr(skb);
     struct sk_buff * copy = 0;
 
+    __u32 v4_src_addr = hdr4->saddr;
+    __u32 v4_dst_addr = hdr4->daddr;
+
     memcpy(v6saddr, cfg_prefixlan, 16);
     memcpy(v6daddr, cfg_prefixwan, 16);
-    memcpy(v6saddr+cfg_offset, &hdr4->saddr, 4);
-    memcpy(v6daddr+cfg_offset, &hdr4->daddr, 4);
+    memcpy(v6saddr+cfg_offset, &v4_src_addr, 4);
+    memcpy(v6daddr+cfg_offset, &v4_dst_addr, 4);
 
     if (cfg_debug>=DEBUG_MATCHED)
     {
-	in4_ntop(buf1, ntohl(hdr4->saddr));
-	in4_ntop(buf2, ntohl(hdr4->daddr));
+	in4_ntop(buf1, hdr4->saddr);
+	in4_ntop(buf2, hdr4->daddr);
 	in6_ntop(buf3, v6saddr);
 	in6_ntop(buf4, v6daddr);
 
@@ -441,8 +445,8 @@ static int ipv6_send_as_ipv4(struct sk_buff * skb)
     int truncSize = 0;
 
 
-    v4saddr = htonl(*( (__u32*)&(hdr->saddr.s6_addr[cfg_offset]) ));
-    v4daddr = htonl(*( (__u32*)&(hdr->daddr.s6_addr[cfg_offset]) ));
+    v4saddr = *( (__u32*)&(hdr->saddr.s6_addr[cfg_offset]) );
+    v4daddr = *( (__u32*)&(hdr->daddr.s6_addr[cfg_offset]) );
 
     if (cfg_debug>DEBUG_NONE)
     {
@@ -634,17 +638,17 @@ static int __init hello_init(void)
     }
     case 24:
     {
-	cfg_v4mask = htonl(0x00ffffff);
+	cfg_v4mask = htonl(0xffffff00);
 	break;
     }
     case 16:
     {
-	cfg_v4mask = htonl(0x0000ffff);
+	cfg_v4mask = htonl(0xffff0000);
 	break;
     }
     case 8:
     {
-	cfg_v4mask = htonl(0x000000ff);
+	cfg_v4mask = htonl(0xff000000);
 	break;
     }
     default:
@@ -713,9 +717,10 @@ static int procfs_read_params(char *page, char **start,
 	len += sprintf(page+len,"\n");
 	len += sprintf(page+len, "v4addr= %s\n", plain_v4);
 	len += sprintf(page+len, "v4masklen = %d\n", cfg_v4masklen);
+        len += sprintf(page+len, "v4mask = %x\n", cfg_v4mask);
 	len += sprintf(page+len, "v4offset = %d bits (%d bytes)\n", cfg_v4offset, cfg_offset);
 	len += sprintf(page+len, "\n");
-	len += sprintf(page+len, "debug=%d", (cfg_debug?1:0) );
+	len += sprintf(page+len, "debug=%d", cfg_debug );
 
 	return len;
 }
