@@ -1,0 +1,15 @@
+ip46nat
+=======
+
+Goal of this project was to provide robust, fast, completely stateless IPv4-IPv6 translation.
+It provides a Linux kernel module for the best efficiency.
+
+Author:
+Tomek Mrugalski <thomson(at)klub(dot)com(dot)pl>
+
+Homepage:
+http://klub.com.pl/ip46nat/
+
+Status:
+Project concluded. Please contact author if you'd like to resume development of this work.
+
